@@ -1,19 +1,33 @@
-#! /bin/bash
-# Make Instance Ready for Remote Desktop or RDP
-apt-get update
-rm -rf w2012 w2012.img w2012.gz ngrok ngrok.zip ng.sh > /dev/null 2>&1
-echo "Download windows files"
-wget -O w2012.gz https://go.aank.me/win/WS2012R2-LinggaHosting.gz
-gunzip w2012.gz
-echo "Wait..."
-echo "I m Working Now.."
-mv w2012 w2012.img
-wget -O ng.sh https://bit.ly/GCngr0k > /dev/null 2>&1
-chmod +x ng.sh
-./ng.sh
+#!/bin/bash
+# Free RDP Google
+# Make Instance Ready for Remote Desktop nomachine
+rm -rf ngrok ngrok.zip ng.sh > /dev/null 2>&1
+echo "======================="
+echo "Downloading ngrok..."
+echo "======================="
+wget -O ngrok.zip https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip > /dev/null 2>&1
+unzip ngrok.zip > /dev/null 2>&1
+
+
+function goto
+{
+    label=$1
+    cd 
+    cmd=$(sed -n "/^:[[:blank:]][[:blank:]]*${label}/{:a;n;p;ba};" $0 | 
+          grep -v ':$')
+    eval "$cmd"
+    exit
+}
+
+: ngrok
+clear
+echo "Go to: https://dashboard.ngrok.com/get-started/your-authtoken"
+read -p "Paste Ngrok Authtoken: " CRP
+./ngrok authtoken $CRP 
+
 clear
 echo "======================="
-echo choose ngrok region
+echo "choose ngrok region (for better connection)."
 echo "======================="
 echo "us - United States (Ohio)"
 echo "eu - Europe (Frankfurt)"
@@ -23,27 +37,21 @@ echo "sa - South America (Sao Paulo)"
 echo "jp - Japan (Tokyo)"
 echo "in - India (Mumbai)"
 read -p "choose ngrok region: " CRP
-./ngrok tcp --region $CRP 3388 &>/dev/null &
+./ngrok tcp --region $CRP 4000 &>/dev/null &
+sleep 1
+if curl --silent --show-error http://127.0.0.1:4040/api/tunnels  > /dev/null 2>&1; then echo OK; else echo "Ngrok Error! Please try again!" && sleep 1 && goto ngrok; fi
+docker run --rm -d --network host --privileged --name nomachine-xfce4-kali -e PASSWORD=LinggaHosting -e USER=aank --cap-add=SYS_PTRACE --shm-size=1g aank999/kalidesk-nm:latest
 clear
-echo Downloading files from aank.me
-apt-get install qemu-system-x86 -y
-echo "Wait..."
-echo "Starting Windows"
-qemu-system-x86_64 -hda w2012.img -m 8G -smp cores=4 -net user,hostfwd=tcp::3388-:3389 -net nic -object rng-random,id=rng0,filename=/dev/urandom -device virtio-rng-pci,rng=rng0 -vga vmware -nographic &>/dev/null &
-clear
-echo RDP Address:
-curl --silent --show-error http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"tcp:..([^"]*).*/\1/p'
-echo "===================================="
-echo "Username: Administrator"
-echo "Password: Lingg@H0sting"
-echo "===================================="
-echo "===================================="
-echo "Don't closse this Tab"
-echo "Wait 1 - 3 minut for finishing bot"
-echo "RDP run up to 50 hours"
-echo "Support YT Channel-> Aank is ME, thankyou"
+echo "=========================================="
+echo "Don't close this tab to keep RDP running"
+echo "Support YT Channel-> Aank is ME, thankyou!"
 echo "Link-> https://aank.me/Youtube"
-echo "===================================="
+echo "=NOMACHINE LOGIN="
+echo "RDP Address:"
+curl --silent --show-error http://127.0.0.1:4040/api/tunnels | sed -nE 's/.*public_url":"tcp:..([^"]*).*/\1/p' 
+echo User: aank
+echo Passwd: LinggaHosting
+echo "=========================================="
 b='\033[1m'
 r='\E[31m'
 g='\E[32m'
@@ -63,4 +71,4 @@ printf """$c$b
     $r  Support YT Channel-> Aank is ME © 2022 $c https://aank.me/Youtube 
           
 $endc$enda""";
-sleep 43200
+seq 1 43200 | while read i; do echo -en "\r Running .     $i s /43200 s";sleep 0.1;echo -en "\r Running ..    $i s /43200 s";sleep 0.1;echo -en "\r Running ...   $i s /43200 s";sleep 0.1;echo -en "\r Running ....  $i s /43200 s";sleep 0.1;echo -en "\r Running ..... $i s /43200 s";sleep 0.1;echo -en "\r Running     . $i s /43200 s";sleep 0.1;echo -en "\r Running  .... $i s /43200 s";sleep 0.1;echo -en "\r Running   ... $i s /43200 s";sleep 0.1;echo -en "\r Running    .. $i s /43200 s";sleep 0.1;echo -en "\r Running     . $i s /43200 s";sleep 0.1; done
